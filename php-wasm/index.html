@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PHP-WASM Interactive Demo</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>PHP-WASM Interactive Demo</h1>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                About PHP-WASM
+            </div>
+            <div class="card-body">
+                <p>This demo shows PHP running directly in your browser using WebAssembly. The PHP code interacts with the browser DOM using the Vrzno JavaScript bridge.</p>
+                <p>Each example below uses <code>&lt;script type="text/php"&gt;</code> tags to run PHP code that can interact with webpage elements.</p>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <div class="card">
+                <div class="card-header">Todo List Demo</div>
+                <div class="card-body">
+                    <p>A more complex example - a Todo list application:</p>
+                    
+                    <div class="todo-demo">
+                        <div class="todo-input">
+                            <input type="text" id="todo-input" placeholder="Add a new task...">
+                            <button id="add-todo">Add</button>
+                        </div>
+                        <ul id="todo-list">
+                            <!-- Todo items will be added here -->
+                        </ul>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">PHP Code:</div>
+                        <div class="card-body">
+                            <pre id="todo-source"></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- New Calculator Demo -->
+        <div class="demo-section">
+            <div class="card">
+                <div class="card-header">Calculator Demo</div>
+                <div class="card-body">
+                    <p>A simple calculator built using PHP-WASM:</p>
+                    
+                    <div class="calculator-demo">
+                        <div class="calculator">
+                            <div id="calc-display" class="calc-display">0</div>
+                            <div class="calc-buttons">
+                                <button id="btn-clear" class="calc-btn">C</button>
+                                <button id="btn-backspace" class="calc-btn">⌫</button>
+                                <button id="btn-percent" class="calc-btn">%</button>
+                                <button id="btn-divide" class="calc-btn">/</button>
+                                
+                                <button id="btn-7" class="calc-btn">7</button>
+                                <button id="btn-8" class="calc-btn">8</button>
+                                <button id="btn-9" class="calc-btn">9</button>
+                                <button id="btn-multiply" class="calc-btn">×</button>
+                                
+                                <button id="btn-4" class="calc-btn">4</button>
+                                <button id="btn-5" class="calc-btn">5</button>
+                                <button id="btn-6" class="calc-btn">6</button>
+                                <button id="btn-subtract" class="calc-btn">-</button>
+                                
+                                <button id="btn-1" class="calc-btn">1</button>
+                                <button id="btn-2" class="calc-btn">2</button>
+                                <button id="btn-3" class="calc-btn">3</button>
+                                <button id="btn-add" class="calc-btn">+</button>
+                                
+                                <button id="btn-0" class="calc-btn calc-btn-zero">0</button>
+                                <button id="btn-decimal" class="calc-btn">.</button>
+                                <button id="btn-equals" class="calc-btn">=</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">PHP Code:</div>
+                        <div class="card-body">
+                            <pre id="calc-source"></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- New Color Picker Demo -->
+        <div class="demo-section">
+            <div class="card">
+                <div class="card-header">Color Picker Demo</div>
+                <div class="card-body">
+                    <p>A color picker that updates in real-time using PHP:</p>
+                    
+                    <div class="color-picker-demo">
+                        <div class="color-controls">
+                            <div class="color-sliders">
+                                <div class="slider-group">
+                                    <label for="red-slider">R:</label>
+                                    <input type="range" id="red-slider" min="0" max="255" value="128" class="color-slider">
+                                    <span id="red-value">128</span>
+                                </div>
+                                <div class="slider-group">
+                                    <label for="green-slider">G:</label>
+                                    <input type="range" id="green-slider" min="0" max="255" value="128" class="color-slider">
+                                    <span id="green-value">128</span>
+                                </div>
+                                <div class="slider-group">
+                                    <label for="blue-slider">B:</label>
+                                    <input type="range" id="blue-slider" min="0" max="255" value="128" class="color-slider">
+                                    <span id="blue-value">128</span>
+                                </div>
+                            </div>
+                            <div id="color-preview" class="color-preview"></div>
+                        </div>
+                        <div class="color-info">
+                            <div id="color-hex" class="color-hex">#808080</div>
+                            <div id="color-rgb" class="color-rgb">rgb(128, 128, 128)</div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">PHP Code:</div>
+                        <div class="card-body">
+                            <pre id="color-source"></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- New Form Validation Demo -->
+        <div class="demo-section">
+            <div class="card">
+                <div class="card-header">Form Validation Demo</div>
+                <div class="card-body">
+                    <p>Form validation with real-time feedback using PHP-WASM:</p>
+                    
+                    <div class="form-demo">
+                        <form id="php-form" class="php-form">
+                            <div class="form-group">
+                                <label for="username">Username:</label>
+                                <input type="text" id="username" class="form-control" placeholder="Enter username (3-20 characters)">
+                                <div id="username-feedback" class="form-feedback"></div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="email">Email:</label>
+                                <input type="email" id="email" class="form-control" placeholder="Enter your email">
+                                <div id="email-feedback" class="form-feedback"></div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="password">Password:</label>
+                                <input type="password" id="password" class="form-control" placeholder="Enter password (min 6 characters)">
+                                <div id="password-feedback" class="form-feedback"></div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="confirm-password">Confirm Password:</label>
+                                <input type="password" id="confirm-password" class="form-control" placeholder="Confirm your password">
+                                <div id="confirm-password-feedback" class="form-feedback"></div>
+                            </div>
+                            
+                            <button type="submit" id="form-submit" class="submit-btn">Submit</button>
+                            <div id="form-result" class="form-result"></div>
+                        </form>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">PHP Code:</div>
+                        <div class="card-body">
+                            <pre id="register-form-source"></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- New Image Gallery Demo -->
+        <div class="demo-section">
+            <div class="card">
+                <div class="card-header">Image Gallery Demo</div>
+                <div class="card-body">
+                    <p>An image gallery with PHP-powered filtering and effects:</p>
+                    
+                    <div class="gallery-demo">
+                        <div class="gallery-controls">
+                            <div class="filter-buttons">
+                                <button id="filter-all" class="filter-btn active">All</button>
+                                <button id="filter-nature" class="filter-btn">Nature</button>
+                                <button id="filter-city" class="filter-btn">City</button>
+                                <button id="filter-abstract" class="filter-btn">Abstract</button>
+                            </div>
+                            <div class="effect-controls">
+                                <label>Effect:</label>
+                                <select id="effect-select">
+                                    <option value="normal">Normal</option>
+                                    <option value="grayscale">Grayscale</option>
+                                    <option value="sepia">Sepia</option>
+                                    <option value="invert">Invert</option>
+                                    <option value="blur">Blur</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div id="gallery-container" class="gallery-container">
+                            <!-- Images will be added here by PHP -->
+                        </div>
+                        
+                        <div id="image-preview" class="image-preview-modal">
+                            <div class="preview-content">
+                                <span id="preview-close" class="preview-close">&times;</span>
+                                <img id="preview-image" class="preview-image">
+                                <div id="preview-caption" class="preview-caption"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">PHP Code:</div>
+                        <div class="card-body">
+                            <pre id="gallery-source"></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- New Data Visualization Demo -->
+        <div class="demo-section">
+            <div class="card">
+                <div class="card-header">Data Visualization Demo</div>
+                <div class="card-body">
+                    <p>A PHP-powered bar chart visualization:</p>
+                    
+                    <div class="chart-demo">
+                        <div class="chart-controls">
+                            <button id="chart-random-data" class="chart-btn">Generate Random Data</button>
+                            <button id="chart-sort-asc" class="chart-btn">Sort Ascending</button>
+                            <button id="chart-sort-desc" class="chart-btn">Sort Descending</button>
+                        </div>
+                        
+                        <div id="chart-container" class="chart-container">
+                            <!-- Chart will be created here by PHP -->
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">PHP Code:</div>
+                        <div class="card-body">
+                            <pre id="chart-source"></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- New Game Demo -->
+        <div class="demo-section">
+            <div class="card">
+                <div class="card-header">Tic-Tac-Toe Game Demo</div>
+                <div class="card-body">
+                    <p>A simple Tic-Tac-Toe game built entirely in PHP-WASM:</p>
+                    
+                    <div class="game-demo">
+                        <div class="game-status" id="game-status">X's turn</div>
+                        <div class="game-board" id="game-board">
+                            <!-- Game cells will be created by PHP -->
+                        </div>
+                        <button id="game-reset" class="game-reset">Reset Game</button>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">PHP Code:</div>
+                        <div class="card-body">
+                            <pre id="tick-toe-source"></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+    <!-- Gallery PHP -->
+    <script id="gallery"  type="text/php" data-stdout="#output" data-stderr="#error">
+        <?php
+          $window = new Vrzno;
+          $document = $window->document;
+
+          // Copy the code for display
+          $scriptContent = $document->getElementById('gallery')->textContent;
+          $document->getElementById('gallery-source')->textContent = $scriptContent;
+
+
+          // Image gallery data
+          $images = [
+            [
+              'id' => 1,
+              'url' => 'https://picsum.photos/id/13/200/300',
+              'title' => 'Nature Scene 1',
+              'category' => 'nature',
+              'description' => 'Beautiful natural landscape with water'
+            ],
+            [
+              'id' => 2,
+              'url' => 'https://picsum.photos/id/57/200/300',
+              'title' => 'City Lights',
+              'category' => 'city',
+              'description' => 'Urban nightscape with city lights'
+            ],
+            [
+              'id' => 3,
+              'url' => 'https://picsum.photos/id/951/200/300',
+              'title' => 'Abstract Art',
+              'category' => 'abstract',
+              'description' => 'Colorful abstract composition'
+            ],
+            [
+              'id' => 4,
+              'url' => 'https://picsum.photos/id/684/200/300',
+              'title' => 'Mountain View',
+              'category' => 'nature',
+              'description' => 'Majestic mountain landscape'
+            ],
+            [
+              'id' => 5,
+              'url' => 'https://picsum.photos/id/972/200/300',
+              'title' => 'Modern Architecture',
+              'category' => 'city',
+              'description' => 'Modern architectural design in urban setting'
+            ],
+            [
+              'id' => 6,
+              'url' => 'https://picsum.photos/id/893/200/300',
+              'title' => 'Geometric Patterns',
+              'category' => 'abstract',
+              'description' => 'Repeating geometric patterns'
+            ]
+          ];
+
+          // Get DOM elements
+          $galleryContainer = $document->querySelector('#gallery-container');
+          $imagePreview = $document->querySelector('#image-preview');
+          $previewImage = $document->querySelector('#preview-image');
+          $previewCaption = $document->querySelector('#preview-caption');
+          $previewClose = $document->querySelector('#preview-close');
+          $effectSelect = $document->querySelector('#effect-select');
+
+          // Filter buttons
+          $filterAllBtn = $document->querySelector('#filter-all');
+          $filterNatureBtn = $document->querySelector('#filter-nature');
+          $filterCityBtn = $document->querySelector('#filter-city');
+          $filterAbstractBtn = $document->querySelector('#filter-abstract');
+
+          // Current state
+          $currentFilter = 'all';
+          $currentEffect = 'normal';
+
+          // Close preview
+          $previewClose->addEventListener('click', function() use($imagePreview) {
+            $imagePreview->style->display = 'none';
+          });
+
+          // Window click to close
+          $window->addEventListener('click', function($event) use($imagePreview) {
+            if ($event->target === $imagePreview) {
+              $imagePreview->style->display = 'none';
+            }
+          });
+
+          // Filter events
+          $filterAllBtn->addEventListener('click', function() use(&$currentFilter, $filterAllBtn, $filterNatureBtn, $filterCityBtn, $filterAbstractBtn, &$renderGallery) {
+            $currentFilter = 'all';
+
+            $filterAllBtn->className = 'filter-btn active';
+            $filterNatureBtn->className = 'filter-btn';
+            $filterCityBtn->className = 'filter-btn';
+            $filterAbstractBtn->className = 'filter-btn';
+
+            $renderGallery();
+          });
+
+          $filterNatureBtn->addEventListener('click', function() use(&$currentFilter, $filterAllBtn, $filterNatureBtn, $filterCityBtn, $filterAbstractBtn, &$renderGallery) {
+            $currentFilter = 'nature';
+
+            $filterAllBtn->className = 'filter-btn';
+            $filterNatureBtn->className = 'filter-btn active';
+            $filterCityBtn->className = 'filter-btn';
+            $filterAbstractBtn->className = 'filter-btn';
+
+            $renderGallery();
+          });
+
+          $filterCityBtn->addEventListener('click', function() use(&$currentFilter, $filterAllBtn, $filterNatureBtn, $filterCityBtn, $filterAbstractBtn, &$renderGallery) {
+            $currentFilter = 'city';
+
+            $filterAllBtn->className = 'filter-btn';
+            $filterNatureBtn->className = 'filter-btn';
+            $filterCityBtn->className = 'filter-btn active';
+            $filterAbstractBtn->className = 'filter-btn';
+
+            $renderGallery();
+          });
+
+          $filterAbstractBtn->addEventListener('click', function() use(&$currentFilter, $filterAllBtn, $filterNatureBtn, $filterCityBtn, $filterAbstractBtn, &$renderGallery) {
+            $currentFilter = 'abstract';
+
+            $filterAllBtn->className = 'filter-btn';
+            $filterNatureBtn->className = 'filter-btn';
+            $filterCityBtn->className = 'filter-btn';
+            $filterAbstractBtn->className = 'filter-btn active';
+
+            $renderGallery();
+          });
+
+          // Effect change
+          $effectSelect->addEventListener('change', function($event) use(&$currentEffect, &$renderGallery) {
+            $currentEffect = $event->target->value;
+            $renderGallery();
+          });
+
+          // Render the gallery (moved to the end)
+          $renderGallery = function() use(&$images, $galleryContainer, $document, &$currentFilter, &$currentEffect, $previewImage, $previewCaption, $imagePreview, $previewClose) {
+            // Clear the container
+            $galleryContainer->innerHTML = '';
+
+            // Apply filter
+            $filteredImages = $currentFilter === 'all' ? $images : array_filter($images, function($img) use($currentFilter) {
+              return $img['category'] === $currentFilter;
+            });
+
+            // Create and append gallery items
+            foreach($filteredImages as $image) {
+              $item = $document->createElement('div');
+              $item->className = 'gallery-item';
+
+              $img = $document->createElement('img');
+              $img->src = $image['url'];
+              $img->alt = $image['title'];
+
+              // Apply effect class
+              if($currentEffect !== 'normal') {
+                $img->className = 'effect-' . $currentEffect;
+              }
+
+              $title = $document->createElement('div');
+              $title->className = 'gallery-title';
+              $title->textContent = $image['title'];
+
+              // Add click event
+              $img->addEventListener('click', function() use($image, $previewImage, $previewCaption, $imagePreview, &$currentEffect) {
+                $previewImage->src = $image['url'];
+                $previewImage->alt = $image['title'];
+                $previewCaption->textContent = $image['description'];
+
+                // Apply effect to preview
+                $previewImage->className = $currentEffect !== 'normal' ? 'effect-' . $currentEffect : '';
+
+                // Show modal
+                $imagePreview->style->display = 'flex';
+              });
+
+              $item->appendChild($img);
+              $item->appendChild($title);
+              $galleryContainer->appendChild($item);
+            }
+          };
+
+          // Initial render
+          $renderGallery();
+        ?>
+    </script>
+    
+    <!-- Chart PHP -->
+    <script id="chart" type="text/php" data-stdout="#output" data-stderr="#error">
+        <?php
+            $window = new Vrzno;
+            $document = $window->document;
+
+            // Copy the code for display
+            $scriptContent = $document->getElementById('chart')->textContent;
+            $document->getElementById('chart-source')->textContent = $scriptContent;
+
+            // Chart elements
+            $chartContainer = $document->querySelector('#chart-container');
+            $randomButton = $document->querySelector('#chart-random-data');
+            $sortAscButton = $document->querySelector('#chart-sort-asc');
+            $sortDescButton = $document->querySelector('#chart-sort-desc');
+
+            // Initial data
+            $data = [
+            ['label' => 'Jan', 'value' => 65],
+            ['label' => 'Feb', 'value' => 42],
+            ['label' => 'Mar', 'value' => 78],
+            ['label' => 'Apr', 'value' => 34],
+            ['label' => 'May', 'value' => 55],
+            ['label' => 'Jun', 'value' => 87],
+            ['label' => 'Jul', 'value' => 65],
+            ['label' => 'Aug', 'value' => 91]
+            ];
+
+            // Color function based on value
+            function getColor($value) {
+            if ($value < 40) return '#6c757d'; // Gray
+            if ($value < 60) return '#17a2b8'; // Info
+            if ($value < 80) return '#28a745'; // Success
+            return '#dc3545'; // Danger
+            }
+
+            // Render chart
+            function renderChart() {
+            global $data, $chartContainer, $document;
+
+            // Clear container
+            $chartContainer->innerHTML = '';
+
+            // Find max value for scaling
+            $maxValue = 0;
+            foreach ($data as $item) {
+              if ($item['value'] > $maxValue) {
+                $maxValue = $item['value'];
+              }
+            }
+
+            // Create chart HTML
+            $chart = $document->createElement('div');
+            $chart->className = 'bar-chart';
+
+            // Create bars
+            foreach ($data as $item) {
+              $barHeight = ($item['value'] / $maxValue) * 100;
+
+              $barContainer = $document->createElement('div');
+              $barContainer->className = 'bar-container';
+
+              $bar = $document->createElement('div');
+              $bar->className = 'bar';
+              $bar->style->height = $barHeight . '%';
+              $bar->style->backgroundColor = getColor($item['value']);
+
+              $tooltip = $document->createElement('div');
+              $tooltip->className = 'tooltip';
+              $tooltip->textContent = $item['value'];
+
+              $label = $document->createElement('div');
+              $label->className = 'bar-label';
+              $label->textContent = $item['label'];
+
+              $bar->appendChild($tooltip);
+              $barContainer->appendChild($bar);
+              $barContainer->appendChild($label);
+              $chart->appendChild($barContainer);
+            }
+
+            $chartContainer->appendChild($chart);
+            }
+
+            // Random data button
+            $randomButton->addEventListener('click', function() {
+            global $data;
+            foreach ($data as &$item) {
+              $item['value'] = rand(10, 100);
+            }
+            renderChart();
+            });
+
+            // Sort ascending
+            $sortAscButton->addEventListener('click', function() {
+            global $data;
+            usort($data, function($a, $b) {
+              return $a['value'] <=> $b['value'];
+            });
+            renderChart();
+            });
+
+            // Sort descending
+            $sortDescButton->addEventListener('click', function() {
+            global $data;
+            usort($data, function($a, $b) {
+              return $b['value'] <=> $a['value'];
+            });
+            renderChart();
+            });
+
+            // Initial render
+            renderChart();
+        ?>
+    </script>
+
+    <script id="tick-toe" type="text/php" data-stdout="#output" data-stderr="#error">
+        <?php
+         $window = new Vrzno;
+         $document = $window->document;
+
+         // Copy the code for display
+         $scriptContent = $document->getElementById('tick-toe')->textContent;
+         $document->getElementById('tick-toe-source')->textContent = $scriptContent;
+
+         // Game elements
+         $gameBoard = $document->querySelector('#game-board');
+         $gameStatus = $document->querySelector('#game-status');
+         $resetButton = $document->querySelector('#game-reset');
+
+         // Game state
+         $currentPlayer = 'X';
+         $gameActive = true;
+         $gameState = ['', '', '', '', '', '', '', '', ''];
+
+         // Winning conditions
+         $winningConditions = [
+           [0, 1, 2],
+           [3, 4, 5],
+           [6, 7, 8],
+           [0, 3, 6],
+           [1, 4, 7],
+           [2, 5, 8],
+           [0, 4, 8],
+           [2, 4, 6]
+         ];
+
+         // Validate result
+         $handleResultValidation = function() use (&$gameState, &$gameActive, &$currentPlayer, $gameStatus, &$winningConditions) {
+           $roundWon = false;
+
+           for ($i = 0; $i < count($winningConditions); $i++) {
+             $winCondition = $winningConditions[$i];
+             $a = $gameState[$winCondition[0]];
+             $b = $gameState[$winCondition[1]];
+             $c = $gameState[$winCondition[2]];
+
+             if ($a === '' || $b === '' || $c === '') {
+               continue;
+             }
+
+             if ($a === $b && $b === $c) {
+               $roundWon = true;
+               break;
+             }
+           }
+
+           if ($roundWon) {
+             $gameStatus->textContent = "Player " . $currentPlayer . " has won!";
+             $gameActive = false;
+             return;
+           }
+
+           if (!in_array('', $gameState)) {
+             $gameStatus->textContent = "Game ended in a draw!";
+             $gameActive = false;
+             return;
+           }
+
+           $currentPlayer = $currentPlayer === 'X' ? 'O' : 'X';
+           $gameStatus->textContent = "Player " . $currentPlayer . "'s turn";
+         };
+
+         // Handle cell click
+         $handleCellClick = function($cellIndex) use (&$gameState, &$gameActive, &$currentPlayer, $gameBoard, $document, &$handleResultValidation) {
+           if (!$gameActive || $gameState[$cellIndex] !== '') {
+             return;
+           }
+
+           $gameState[$cellIndex] = $currentPlayer;
+
+           $cell = $document->querySelector('[data-cell-index="' . $cellIndex . '"]');
+           $cell->textContent = $currentPlayer;
+           $cell->className = 'game-cell game-cell-' . strtolower($currentPlayer);
+
+           $handleResultValidation();
+         };
+
+         // Initialize the game board
+         $initializeGame = function() use ($gameBoard, $document, &$handleCellClick) {
+           $gameBoard->innerHTML = '';
+
+           for ($i = 0; $i < 9; $i++) {
+             $cell = $document->createElement('div');
+             $cell->className = 'game-cell';
+             $cell->setAttribute('data-cell-index', $i);
+
+             $cell->addEventListener('click', function() use ($cell, &$handleCellClick) {
+               $index = intval($cell->getAttribute('data-cell-index'));
+               $handleCellClick($index);
+             });
+
+             $gameBoard->appendChild($cell);
+           }
+         };
+
+         // Reset game
+         $resetGame = function() use (&$gameState, &$gameActive, &$currentPlayer, $gameStatus, $document, &$initializeGame) {
+           $gameActive = true;
+           $currentPlayer = 'X';
+           $gameState = ['', '', '', '', '', '', '', '', ''];
+           $gameStatus->textContent = "Player X's turn";
+           $initializeGame();
+         };
+
+         // Add reset button event
+         $resetButton->addEventListener('click', function() use (&$resetGame) {
+           $resetGame();
+         });
+
+         // Initialize the game
+         $initializeGame();
+       ?>
+    </script>
+
+    <!-- Todo List Demo PHP -->
+    <script id="todo" type="text/php" data-stdout="#output" data-stderr="#error">
+    <?php
+      $window = new Vrzno;
+      $document = $window->document;
+
+      // Copy the code for display
+      $scriptContent = $document->getElementById('todo')->textContent;
+      $document->getElementById('todo-source')->textContent = $scriptContent;
+
+      $input = $document->querySelector('#todo-input');
+      $addButton = $document->querySelector('#add-todo');
+      $todoList = $document->querySelector('#todo-list');
+      
+      $todoItems = [];
+      
+      $addTodo = function() use(&$todoItems, $document, $input, $todoList) {
+        $text = $input->value;
+        
+        if(trim($text) === '') {
+          return;
+        }
+        
+        $todoItems[] = $text;
+        $input->value = '';
+        
+        // Clear the list
+        $todoList->innerHTML = '';
+        
+        // Rebuild the list
+        foreach($todoItems as $index => $item) {
+          $li = $document->createElement('li');
+          $li->className = 'todo-item';
+          
+          $span = $document->createElement('span');
+          $span->textContent = $item;
+          
+          $deleteBtn = $document->createElement('button');
+          $deleteBtn->textContent = 'Delete';
+          
+          // Add delete handler
+          $deleteBtn->addEventListener('click', function() use($index, &$todoItems, $todoList, $document) {
+            array_splice($todoItems, $index, 1);
+            
+            // Redraw the list
+            $todoList->innerHTML = '';
+            foreach($todoItems as $i => $todo) {
+              $li = $document->createElement('li');
+              $li->className = 'todo-item';
+              
+              $span = $document->createElement('span');
+              $span->textContent = $todo;
+              
+              $deleteBtn = $document->createElement('button');
+              $deleteBtn->textContent = 'Delete';
+              
+              $li->appendChild($span);
+              $li->appendChild($deleteBtn);
+              $todoList->appendChild($li);
+            }
+          });
+          
+          $li->appendChild($span);
+          $li->appendChild($deleteBtn);
+          $todoList->appendChild($li);
+        }
+      };
+      
+      $addButton->addEventListener('click', $addTodo);
+      
+      // Handle Enter key
+      $input->addEventListener('keypress', function($event) use($addTodo) {
+        if($event->keyCode === 13) {
+          $addTodo();
+        }
+      });
+    ?>
+    </script>
+    
+    <!-- Calculator Demo PHP -->
+    <script id="calc" type="text/php" data-stdout="#output" data-stderr="#error">
+    <?php
+      $window = new Vrzno;
+      $document = $window->document;
+
+      // Copy the code for display
+      $scriptContent = $document->getElementById('calc')->textContent;
+      $document->getElementById('calc-source')->textContent = $scriptContent;
+
+      // Get display element
+      $display = $document->querySelector('#calc-display');
+      
+      // Calculator state
+      $currentInput = "0";
+      $previousInput = "";
+      $operation = null;
+      $resetInput = false;
+      
+      // Button click handlers
+      $numberClick = function($number) use(&$currentInput, &$resetInput, $display) {
+        if ($currentInput === "0" || $resetInput) {
+          $currentInput = $number;
+          $resetInput = false;
+        } else {
+          $currentInput .= $number;
+        }
+        $display->textContent = $currentInput;
+      };
+      
+      $operationClick = function($op) use(&$currentInput, &$previousInput, &$operation, &$resetInput, $display, &$calculate) {
+        if ($operation !== null && !$resetInput) {
+          $calculate();
+        }
+        
+        $previousInput = $currentInput;
+        $operation = $op;
+        $resetInput = true;
+      };
+      
+      $calculate = function() use(&$currentInput, &$previousInput, &$operation, &$resetInput, $display) {
+        $a = floatval($previousInput);
+        $b = floatval($currentInput);
+        $result = 0;
+        
+        switch($operation) {
+          case '+': $result = $a + $b; break;
+          case '-': $result = $a - $b; break;
+          case '×': $result = $a * $b; break;
+          case '/': $result = $b !== 0 ? $a / $b : "Error"; break;
+          case '%': $result = $a % $b; break;
+        }
+        
+        // Format the result
+        if (is_numeric($result)) {
+          $result = strval($result);
+          // Remove trailing zeros for decimal numbers
+          if (strpos($result, '.') !== false) {
+            $result = rtrim(rtrim($result, '0'), '.');
+          }
+        }
+        
+        $currentInput = $result;
+        $operation = null;
+        $resetInput = true;
+        $display->textContent = $result;
+      };
+      
+      // Attach event listeners to buttons
+      for($i = 0; $i <= 9; $i++) {
+        $button = $document->querySelector("#btn-$i");
+        $num = $i; // Need to use a separate variable to avoid closure issues
+        $button->addEventListener('click', function() use($num, $numberClick) {
+          $numberClick(strval($num));
+        });
+      }
+      
+      // Operation buttons
+      $document->querySelector('#btn-add')->addEventListener('click', function() use($operationClick) {
+        $operationClick('+');
+      });
+      
+      $document->querySelector('#btn-subtract')->addEventListener('click', function() use($operationClick) {
+        $operationClick('-');
+      });
+      
+      $document->querySelector('#btn-multiply')->addEventListener('click', function() use($operationClick) {
+        $operationClick('×');
+      });
+      
+      $document->querySelector('#btn-divide')->addEventListener('click', function() use($operationClick) {
+        $operationClick('/');
+      });
+      
+      $document->querySelector('#btn-percent')->addEventListener('click', function() use($operationClick) {
+        $operationClick('%');
+      });
+      
+      // Equals button
+      $document->querySelector('#btn-equals')->addEventListener('click', function() use($calculate) {
+        $calculate();
+      });
+      
+      // Clear button
+      $document->querySelector('#btn-clear')->addEventListener('click', function() use(&$currentInput, &$previousInput, &$operation, $display) {
+        $currentInput = "0";
+        $previousInput = "";
+        $operation = null;
+        $display->textContent = $currentInput;
+      });
+      
+      // Decimal button
+      $document->querySelector('#btn-decimal')->addEventListener('click', function() use(&$currentInput, &$resetInput, $display) {
+        if ($resetInput) {
+          $currentInput = "0.";
+          $resetInput = false;
+        } else if (strpos($currentInput, '.') === false) {
+          $currentInput .= '.';
+        }
+        $display->textContent = $currentInput;
+      });
+      
+      // Backspace button
+      $document->querySelector('#btn-backspace')->addEventListener('click', function() use(&$currentInput, $display) {
+        if (strlen($currentInput) > 1) {
+          $currentInput = substr($currentInput, 0, -1);
+        } else {
+          $currentInput = "0";
+        }
+        $display->textContent = $currentInput;
+      });
+    ?>
+    </script>
+    
+    <!-- Color Picker Demo PHP -->
+    <script id="color" type="text/php" data-stdout="#output" data-stderr="#error">
+    <?php
+      $window = new Vrzno;
+      $document = $window->document;
+
+      // Copy the code for display
+      $scriptContent = $document->getElementById('color')->textContent;
+      $document->getElementById('color-source')->textContent = $scriptContent;
+
+      // Get elements
+      $redSlider = $document->querySelector('#red-slider');
+      $greenSlider = $document->querySelector('#green-slider');
+      $blueSlider = $document->querySelector('#blue-slider');
+      
+      $redValue = $document->querySelector('#red-value');
+      $greenValue = $document->querySelector('#green-value');
+      $blueValue = $document->querySelector('#blue-value');
+      
+      $colorPreview = $document->querySelector('#color-preview');
+      $colorHex = $document->querySelector('#color-hex');
+      $colorRgb = $document->querySelector('#color-rgb');
+      
+      // Initial color values
+      $red = 128;
+      $green = 128;
+      $blue = 128;
+      
+      // Update color function
+      $updateColor = function() use(&$red, &$green, &$blue, $colorPreview, $colorHex, $colorRgb) {
+        // Create color strings
+        $rgbString = "rgb($red, $green, $blue)";
+        
+        // Convert to hex
+        $redHex = dechex($red);
+        $greenHex = dechex($green);
+        $blueHex = dechex($blue);
+        
+        // Ensure 2 digits
+        if (strlen($redHex) === 1) $redHex = "0$redHex";
+        if (strlen($greenHex) === 1) $greenHex = "0$greenHex";
+        if (strlen($blueHex) === 1) $blueHex = "0$blueHex";
+        
+        $hexString = "#" . $redHex . $greenHex . $blueHex;
+        
+        // Update display
+        $colorPreview->style->backgroundColor = $rgbString;
+        $colorHex->textContent = strtoupper($hexString);
+        $colorRgb->textContent = $rgbString;
+      };
+      
+      // Set up event listeners
+      $redSlider->addEventListener('input', function($event) use(&$red, $redValue, $updateColor) {
+        $red = intval($event->target->value);
+        $redValue->textContent = $red;
+        $updateColor();
+      });
+      
+      $greenSlider->addEventListener('input', function($event) use(&$green, $greenValue, $updateColor) {
+        $green = intval($event->target->value);
+        $greenValue->textContent = $green;
+        $updateColor();
+      });
+      
+      $blueSlider->addEventListener('input', function($event) use(&$blue, $blueValue, $updateColor) {
+        $blue = intval($event->target->value);
+        $blueValue->textContent = $blue;
+        $updateColor();
+      });
+      
+      // Initialize the color display
+      $updateColor();
+    ?>
+    </script>
+    
+    <!-- Form Validation Demo PHP -->
+    <script id="register-form" type="text/php" data-stdout="#output" data-stderr="#error">
+    <?php
+      $window = new Vrzno;
+      $document = $window->document;
+
+      // Copy the code for display
+      $scriptContent = $document->getElementById('register-form')->textContent;
+      $document->getElementById('register-form-source')->textContent = $scriptContent;
+
+      // Get form elements
+      $form = $document->querySelector('#php-form');
+      $username = $document->querySelector('#username');
+      $email = $document->querySelector('#email');
+      $password = $document->querySelector('#password');
+      $confirmPassword = $document->querySelector('#confirm-password');
+      $submitBtn = $document->querySelector('#form-submit');
+      
+      // Get feedback elements
+      $usernameFeedback = $document->querySelector('#username-feedback');
+      $emailFeedback = $document->querySelector('#email-feedback');
+      $passwordFeedback = $document->querySelector('#password-feedback');
+      $confirmPasswordFeedback = $document->querySelector('#confirm-password-feedback');
+      $formResult = $document->querySelector('#form-result');
+      
+      // Form validity state
+      $isValid = [
+        'username' => false,
+        'email' => false,
+        'password' => false,
+        'confirmPassword' => false
+      ];
+      
+      // Validation functions
+      $validateUsername = function() use(&$isValid, $username, $usernameFeedback) {
+        $value = $username->value;
+        $length = strlen($value);
+        
+        if ($length === 0) {
+          $usernameFeedback->textContent = "";
+          $username->className = "form-control";
+          $isValid['username'] = false;
+          return;
+        }
+        
+        if ($length < 3) {
+          $usernameFeedback->textContent = "Username must be at least 3 characters";
+          $usernameFeedback->className = "form-feedback invalid-feedback";
+          $username->className = "form-control invalid";
+          $isValid['username'] = false;
+        } else if ($length > 20) {
+          $usernameFeedback->textContent = "Username must be less than 20 characters";
+          $usernameFeedback->className = "form-feedback invalid-feedback";
+          $username->className = "form-control invalid";
+          $isValid['username'] = false;
+        } else if (!preg_match('/^[a-zA-Z0-9_]+$/', $value)) {
+          $usernameFeedback->textContent = "Username can only contain letters, numbers, and underscores";
+          $usernameFeedback->className = "form-feedback invalid-feedback";
+          $username->className = "form-control invalid";
+          $isValid['username'] = false;
+        } else {
+          $usernameFeedback->textContent = "Username looks good!";
+          $usernameFeedback->className = "form-feedback valid-feedback";
+          $username->className = "form-control valid";
+          $isValid['username'] = true;
+        }
+      };
+      
+      $validateEmail = function() use(&$isValid, $email, $emailFeedback) {
+        $value = $email->value;
+        
+        if (strlen($value) === 0) {
+          $emailFeedback->textContent = "";
+          $email->className = "form-control";
+          $isValid['email'] = false;
+          return;
+        }
+        
+        if (!filter_var($value, FILTER_VALIDATE_EMAIL)) {
+          $emailFeedback->textContent = "Please enter a valid email address";
+          $emailFeedback->className = "form-feedback invalid-feedback";
+          $email->className = "form-control invalid";
+          $isValid['email'] = false;
+        } else {
+          $emailFeedback->textContent = "Email is valid!";
+          $emailFeedback->className = "form-feedback valid-feedback";
+          $email->className = "form-control valid";
+          $isValid['email'] = true;
+        }
+      };
+      
+      $validatePassword = function() use(&$isValid, $password, $passwordFeedback) {
+        $value = $password->value;
+        $length = strlen($value);
+        
+        if ($length === 0) {
+          $passwordFeedback->textContent = "";
+          $password->className = "form-control";
+          $isValid['password'] = false;
+          return;
+        }
+        
+        if ($length < 6) {
+          $passwordFeedback->textContent = "Password must be at least 6 characters";
+          $passwordFeedback->className = "form-feedback invalid-feedback";
+          $password->className = "form-control invalid";
+          $isValid['password'] = false;
+        } else if (!preg_match('/[A-Z]/', $value)) {
+          $passwordFeedback->textContent = "Password must contain at least one uppercase letter";
+          $passwordFeedback->className = "form-feedback invalid-feedback";
+          $password->className = "form-control invalid";
+          $isValid['password'] = false;
+        } else if (!preg_match('/[0-9]/', $value)) {
+          $passwordFeedback->textContent = "Password must contain at least one number";
+          $passwordFeedback->className = "form-feedback invalid-feedback";
+          $password->className = "form-control invalid";
+          $isValid['password'] = false;
+        } else {
+          $passwordFeedback->textContent = "Password strength: Good";
+          $passwordFeedback->className = "form-feedback valid-feedback";
+          $password->className = "form-control valid";
+          $isValid['password'] = true;
+        }
+      };
+      
+      $validateConfirmPassword = function() use(&$isValid, $password, $confirmPassword, $confirmPasswordFeedback) {
+        $passwordValue = $password->value;
+        $confirmValue = $confirmPassword->value;
+        
+        if (strlen($confirmValue) === 0) {
+          $confirmPasswordFeedback->textContent = "";
+          $confirmPassword->className = "form-control";
+          $isValid['confirmPassword'] = false;
+          return;
+        }
+        
+        if ($passwordValue !== $confirmValue) {
+          $confirmPasswordFeedback->textContent = "Passwords do not match";
+          $confirmPasswordFeedback->className = "form-feedback invalid-feedback";
+          $confirmPassword->className = "form-control invalid";
+          $isValid['confirmPassword'] = false;
+        } else {
+          $confirmPasswordFeedback->textContent = "Passwords match!";
+          $confirmPasswordFeedback->className = "form-feedback valid-feedback";
+          $confirmPassword->className = "form-control valid";
+          $isValid['confirmPassword'] = true;
+        }
+      };
+      
+      // Add event listeners
+      $username->addEventListener('input', $validateUsername);
+      $email->addEventListener('input', $validateEmail);
+      $password->addEventListener('input', function() use($validatePassword, $validateConfirmPassword) {
+        $validatePassword();
+        $validateConfirmPassword();
+      });
+      $confirmPassword->addEventListener('input', $validateConfirmPassword);
+      
+      // Form submission
+      $form->addEventListener('submit', function($event) use(&$isValid, $validateUsername, $validateEmail, $validatePassword, $validateConfirmPassword, $formResult) {
+        $event->preventDefault();
+        
+        // Run all validations
+        $validateUsername();
+        $validateEmail();
+        $validatePassword();
+        $validateConfirmPassword();
+        
+        // Check if all fields are valid
+        if ($isValid['username'] && $isValid['email'] && $isValid['password'] && $isValid['confirmPassword']) {
+          $formResult->textContent = "Form submitted successfully!";
+          $formResult->className = "form-result success";
+        } else {
+          $formResult->textContent = "Please fix the errors in the form.";
+          $formResult->className = "form-result error";
+        }
+      });
+    ?>
+    </script>
+
+    <div class="card">
+        <div class="card-header">Console Output</div>
+        <div class="card-body">
+            <pre id="output"></pre>
+            <pre id="error"></pre>
+        </div>
+    </div>
+
+    <!-- Include JS files -->
+    <script src="js/app.js"></script>
+
+    <!-- PHP-WASM Script -->
+    <script async type="text/javascript" src="https://cdn.jsdelivr.net/npm/php-wasm/php-tags.mjs"></script>
+
+    <footer>
+        <div class="container">
+            <p>Powered by <a href="https://github.com/seanmorris/php-wasm" target="_blank">php-wasm</a></p>
+        </div>
+    </footer>
+</body>
+</html>
