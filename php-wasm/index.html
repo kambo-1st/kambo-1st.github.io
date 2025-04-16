@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PHP-WASM Interactive Demo</title>
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/a11y-light.min.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/php.min.js"></script>
 </head>
 <body>
     <header>
@@ -306,6 +312,8 @@
           $scriptContent = $document->getElementById('gallery')->textContent;
           $document->getElementById('gallery-source')->textContent = $scriptContent;
 
+          // Highlight the code
+          $window->hljs->highlightElement($document->getElementById('gallery-source'));
 
           // Image gallery data
           $images = [
@@ -496,6 +504,9 @@
             $scriptContent = $document->getElementById('chart')->textContent;
             $document->getElementById('chart-source')->textContent = $scriptContent;
 
+            // Highlight the code
+            $window->hljs->highlightElement($document->getElementById('chart-source'));
+
             // Chart elements
             $chartContainer = $document->querySelector('#chart-container');
             $randomButton = $document->querySelector('#chart-random-data');
@@ -610,6 +621,9 @@
          // Copy the code for display
          $scriptContent = $document->getElementById('tick-toe')->textContent;
          $document->getElementById('tick-toe-source')->textContent = $scriptContent;
+
+         // Highlight the code
+         $window->hljs->highlightElement($document->getElementById('tick-toe-source'));
 
          // Game elements
          $gameBoard = $document->querySelector('#game-board');
@@ -731,6 +745,9 @@
       $scriptContent = $document->getElementById('todo')->textContent;
       $document->getElementById('todo-source')->textContent = $scriptContent;
 
+      // Highlight the code
+      $window->hljs->highlightElement($document->getElementById('todo-source'));
+
       $input = $document->querySelector('#todo-input');
       $addButton = $document->querySelector('#add-todo');
       $todoList = $document->querySelector('#todo-list');
@@ -809,6 +826,9 @@
       // Copy the code for display
       $scriptContent = $document->getElementById('calc')->textContent;
       $document->getElementById('calc-source')->textContent = $scriptContent;
+
+      // Highlight the code
+      $window->hljs->highlightElement($document->getElementById('calc-source'));
 
       // Get display element
       $display = $document->querySelector('#calc-display');
@@ -944,6 +964,9 @@
       $scriptContent = $document->getElementById('color')->textContent;
       $document->getElementById('color-source')->textContent = $scriptContent;
 
+      // Highlight the code
+      $window->hljs->highlightElement($document->getElementById('color-source'));
+
       // Get elements
       $redSlider = $document->querySelector('#red-slider');
       $greenSlider = $document->querySelector('#green-slider');
@@ -1018,6 +1041,9 @@
       // Copy the code for display
       $scriptContent = $document->getElementById('register-form')->textContent;
       $document->getElementById('register-form-source')->textContent = $scriptContent;
+
+      // Highlight the code
+      $window->hljs->highlightElement($document->getElementById('register-form-source'));
 
       // Get form elements
       $form = $document->querySelector('#php-form');
