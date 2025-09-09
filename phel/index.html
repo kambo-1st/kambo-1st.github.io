@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Initial template</title>
+        <link rel="stylesheet" href="css/style.css">
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/a11y-light.min.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    </head>
+    <body>
+        <script type="module">
+            import php from "./build/php-web.mjs";
+
+            document.addEventListener('DOMContentLoaded', async () => {
+                const buffer = [];
+                let isRunning = false;
+                let firstChunkShown = false;
+                const resultEl = document.getElementById('result');
+                const runBtn = document.getElementById('run');
+
+                function setLoading(loading) {
+                    if (!runBtn) return;
+                    runBtn.disabled = loading;
+                    if (loading) {
+                        runBtn.dataset._originalText = runBtn.dataset._originalText || runBtn.textContent;
+                        runBtn.textContent = 'Running...';
+                    } else {
+                        if (runBtn.dataset._originalText) {
+                            runBtn.textContent = runBtn.dataset._originalText;
+                        }
+                    }
+                }
+
+                const {ccall, FS} = await php({
+                    print(data) {
+                        buffer.push(data);
+
+                // Only stop loading when we get the first NON-Deprecated output chunk
+                if (isRunning && !firstChunkShown) {
+                    const isDeprecated = /^Deprecated:.*\bon line \d+\s*$/.test(data);
+                    if (!isDeprecated) {
+                        if (resultEl) {
+                            resultEl.innerHTML = data;
+                        }
+                        firstChunkShown = true;
+                        setLoading(false);
+                    }
+                }
+            }
+        })
+
+                // ... existing code ...
+                FS.writeFile('/app/test.php', "<?php echo 'hello world';");
+
+                // Set up run button to take code from editor and write to /app/src/test.phel, then execute
+                if (runBtn) {
+                    runBtn.addEventListener('click', async () => {
+                        try {
+                            const editorValue = (window.editor && typeof window.editor.getValue === 'function') ? window.editor.getValue() : '';
+                            // Write editor content to the target file
+                            FS.writeFile('/app/src/test.phel', editorValue);
+
+                            // Prepare state
+                            buffer.length = 0;
+                            isRunning = true;
+                            firstChunkShown = false;
+                            if (resultEl) resultEl.textContent = '';
+                            setLoading(true);
+
+                            // Execute PHP WASM entry point
+                            ccall('phpw_with_args', 'string', ['string', 'string', 'string'], [
+                                '/app/src/wasm-entry/entry-point.php'/*, 'argument', 'argument2'*/
+                            ]);
+
+                            // Finalize: Filter and render full output
+                            const buffer2 = buffer.filter((line) => !/^Deprecated:.*\bon line \d+\s*$/.test(line));
+                            const htmlString = buffer2.join('');
+                            if (resultEl) {
+                                resultEl.innerHTML = htmlString;
+                                if (window.hljs) {
+                                    document.querySelectorAll('#result pre code').forEach((el) => window.hljs.highlightElement(el));
+                                }
+                            }
+                            console.log(htmlString);
+                        } catch (e) {
+                            console.error('Run failed:', e);
+                            if (resultEl) {
+                                resultEl.textContent = String(e);
+                            }
+                        } finally {
+                    // Ensure button is enabled even if no (non-deprecated) output came
+                    isRunning = false;
+                    setLoading(false);
+                }
+            });
+        }
+
+        // Note: Initial auto-execution removed; execution now happens on Run button click
+    });
+</script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.min.js"></script>
+        <script>
+            require.config({ paths: { vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs" } });
+
+            require(["vs/editor/editor.main"], function () {
+                // Register Clojure as a language
+                monaco.languages.register({ id: "clojure" });
+
+                // Define a very simple Clojure tokenizer (Monarch)
+                monaco.languages.setMonarchTokensProvider("clojure", {
+                    tokenizer: {
+                        root: [
+                            [/[0-9]+(\.[0-9]+)?/, "number"],
+                            [/;.*$/, "comment"],
+                            [/"([^"\\]|\\.)*$/, "string.invalid"], // non-terminated string
+                            [/"([^"\\]|\\.)*"/, "string"],
+                            [/\b(defn|def|let|if|do|fn|loop|recur|quote|var|case|throw|try|catch|finally|new|set!|ns|in-ns|gen-class|import|use|require|refer)\b/, "keyword"],
+                            [/[a-zA-Z_!\-\?][a-zA-Z0-9_!\-\?]*/, "identifier"],
+                            [/[()\[\]{}]/, "@brackets"]
+                        ]
+                    }
+                });
+
+                // Create editor
+                const editor = monaco.editor.create(document.getElementById("editor"), {
+                    value: `# Define a namespace
+(ns my\\example)
+
+# Create a variable
+(def my-name "world")
+
+# Define a function
+(defn print-name [your-name]
+  (print "hello" your-name))
+
+# Call the function
+(print-name my-name)
+`,
+                    language: "clojure",
+                    theme: "vs-light",
+                    automaticLayout: true
+                });
+
+                // Expose editor instance for the Run handler
+                window.editor = editor;
+            });
+        </script>
+
+        <div id="editor"></div>
+        <div id="output">
+            <button id="run">Run</button>
+            <pre id="result"></pre>
+        </div>
+    </body>
+</html>
