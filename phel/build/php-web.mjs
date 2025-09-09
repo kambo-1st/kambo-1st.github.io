@@ -58,7 +58,7 @@ var moduleOverrides = Object.assign({}, Module);
         PACKAGE_PATH = encodeURIComponent(location.pathname.substring(0, location.pathname.lastIndexOf('/')) + '/');
       }
       var PACKAGE_NAME = 'build/php-web.data';
-      var REMOTE_PACKAGE_BASE = '/build/php-web.data';
+      var REMOTE_PACKAGE_BASE = './build/php-web.data';
       var REMOTE_PACKAGE_NAME = Module['locateFile'] ? Module['locateFile'](REMOTE_PACKAGE_BASE, '') : REMOTE_PACKAGE_BASE;
 var REMOTE_PACKAGE_SIZE = metadata['remote_package_size'];
 
