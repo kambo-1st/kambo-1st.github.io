@@ -1,0 +1,20 @@
+{
+  "name": "hokuto-wasm",
+  "type": "module",
+  "collaborators": [
+    "Hokuto Team"
+  ],
+  "description": "WebAssembly build of Hokuto HTML/CSS renderer with WebGL backend",
+  "version": "0.1.0",
+  "license": "MIT",
+  "files": [
+    "hokuto_wasm_bg.wasm",
+    "hokuto_wasm.js",
+    "hokuto_wasm.d.ts"
+  ],
+  "main": "hokuto_wasm.js",
+  "types": "hokuto_wasm.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}

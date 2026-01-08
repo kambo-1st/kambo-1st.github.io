@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Hokuto WebAssembly Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #1a1a2e;
+            color: #e0e0e0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        header {
+            background: #16213e;
+            padding: 1rem 2rem;
+            border-bottom: 1px solid #0f3460;
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+        header h1 {
+            font-size: 1.5rem;
+            color: #4fc3f7;
+        }
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .tab {
+            background: transparent;
+            color: #888;
+            border: 1px solid #0f3460;
+            padding: 0.5rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .tab:hover {
+            background: #0f3460;
+            color: #e0e0e0;
+        }
+        .tab.active {
+            background: #4fc3f7;
+            color: #1a1a2e;
+            border-color: #4fc3f7;
+        }
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .view {
+            display: none;
+            flex: 1;
+        }
+        .view.active {
+            display: flex;
+        }
+
+        /* Playground styles */
+        #playground {
+            flex-direction: row;
+            padding: 1rem;
+            gap: 1rem;
+        }
+        .panel {
+            background: #16213e;
+            border-radius: 8px;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+        }
+        .preview-panel {
+            flex: 2;
+            min-height: 600px;
+        }
+        .editor-panel {
+            flex: 1;
+            min-width: 400px;
+        }
+        .panel h2 {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            color: #81c784;
+        }
+        textarea {
+            flex: 1;
+            background: #0f3460;
+            color: #e0e0e0;
+            border: 1px solid #1a1a2e;
+            border-radius: 4px;
+            padding: 0.5rem;
+            font-family: "Fira Code", "Monaco", monospace;
+            font-size: 13px;
+            resize: none;
+        }
+        textarea:focus {
+            outline: none;
+            border-color: #4fc3f7;
+        }
+        #canvas {
+            flex: 1;
+            background: white;
+            border-radius: 4px;
+            width: 100%;
+        }
+        .toolbar {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        button {
+            background: #4fc3f7;
+            color: #1a1a2e;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        button:hover {
+            background: #81d4fa;
+        }
+        .status {
+            font-size: 0.8rem;
+            color: #888;
+            margin-top: 0.5rem;
+        }
+        .error {
+            color: #ff6b6b;
+        }
+
+        /* Showroom styles */
+        #showroom {
+            flex-direction: row;
+            height: calc(100vh - 60px);
+        }
+        .sidebar {
+            width: 300px;
+            background: #16213e;
+            border-right: 1px solid #0f3460;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .sidebar-header {
+            padding: 1rem;
+            border-bottom: 1px solid #0f3460;
+        }
+        .sidebar-header input {
+            width: 100%;
+            padding: 0.5rem;
+            background: #0f3460;
+            border: 1px solid #1a1a2e;
+            border-radius: 4px;
+            color: #e0e0e0;
+            font-size: 14px;
+        }
+        .sidebar-header input:focus {
+            outline: none;
+            border-color: #4fc3f7;
+        }
+        .example-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0.5rem;
+        }
+        .example-item {
+            padding: 0.75rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 2px;
+            font-size: 13px;
+            transition: background 0.2s;
+        }
+        .example-item:hover {
+            background: #0f3460;
+        }
+        .example-item.active {
+            background: #4fc3f7;
+            color: #1a1a2e;
+        }
+        .example-item .category {
+            font-size: 11px;
+            color: #888;
+            margin-bottom: 2px;
+        }
+        .example-item.active .category {
+            color: #16213e;
+        }
+        .showroom-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .showroom-preview {
+            flex: 1;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+        #showroom-canvas {
+            flex: 1;
+            background: white;
+            border-radius: 4px;
+            width: 100%;
+        }
+        .showroom-info {
+            padding: 0.5rem 1rem;
+            background: #16213e;
+            border-top: 1px solid #0f3460;
+            font-size: 13px;
+            color: #888;
+        }
+        .example-count {
+            color: #4fc3f7;
+            font-size: 12px;
+            padding: 0.5rem 1rem;
+            border-bottom: 1px solid #0f3460;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Hokuto WebAssembly</h1>
+        <div class="tabs">
+            <button class="tab active" data-view="playground">Playground</button>
+            <button class="tab" data-view="showroom">Showroom</button>
+        </div>
+        <div class="status" id="status">Loading...</div>
+    </header>
+
+    <!-- Playground View -->
+    <main>
+        <div id="playground" class="view active">
+            <div class="panel editor-panel">
+                <h2>HTML</h2>
+                <textarea id="html-editor"><!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            background: #1a1a2e;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+        }
+        h1 {
+            color: #4fc3f7;
+            margin-bottom: 10px;
+        }
+        p {
+            color: #e0e0e0;
+            margin-bottom: 20px;
+        }
+        .box {
+            background: #ff6b9d;
+            color: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Hello Hokuto!</h1>
+        <p>This is rendered using WebGL.</p>
+        <div class="box">Box 1</div>
+        <div class="box">Box 2</div>
+        <div class="box">Box 3</div>
+    </div>
+</body>
+</html></textarea>
+                <div class="toolbar">
+                    <button id="render-btn">Render</button>
+                </div>
+            </div>
+            <div class="panel preview-panel">
+                <h2>Preview (WebGL)</h2>
+                <canvas id="canvas"></canvas>
+            </div>
+        </div>
+
+        <!-- Showroom View -->
+        <div id="showroom" class="view">
+            <div class="sidebar">
+                <div class="sidebar-header">
+                    <input type="text" id="search-input" placeholder="Search examples...">
+                </div>
+                <div class="example-count" id="example-count">Loading...</div>
+                <div class="example-list" id="example-list"></div>
+            </div>
+            <div class="showroom-content">
+                <div class="showroom-preview">
+                    <canvas id="showroom-canvas"></canvas>
+                </div>
+                <div class="showroom-info" id="showroom-info">Select an example from the list</div>
+            </div>
+        </div>
+    </main>
+
+    <script type="module">
+        import init, { HokutoRenderer, version } from './pkg/hokuto_wasm.js';
+
+        let playgroundRenderer = null;
+        let showroomRenderer = null;
+        let examples = [];
+        let currentExample = null;
+
+        async function main() {
+            try {
+                // Initialize WASM module
+                document.getElementById('status').textContent = 'Loading WASM...';
+                await init();
+
+                const ver = version();
+                console.log(`Hokuto WASM v${ver}`);
+
+                // Create playground renderer
+                document.getElementById('status').textContent = 'Creating renderer...';
+                playgroundRenderer = new HokutoRenderer('canvas');
+
+                document.getElementById('status').textContent = `Ready (v${ver})`;
+
+                // Initial render
+                doPlaygroundRender();
+
+                // Set up playground
+                setupPlayground();
+
+                // Set up tabs
+                setupTabs();
+
+                // Load showroom examples
+                await loadShowroom();
+
+            } catch (err) {
+                console.error('Failed to initialize:', err);
+                document.getElementById('status').textContent = `Error: ${err}`;
+                document.getElementById('status').classList.add('error');
+            }
+        }
+
+        function setupPlayground() {
+            document.getElementById('render-btn').addEventListener('click', doPlaygroundRender);
+
+            let timeout;
+            document.getElementById('html-editor').addEventListener('input', () => {
+                clearTimeout(timeout);
+                timeout = setTimeout(doPlaygroundRender, 500);
+            });
+
+            const canvas = document.getElementById('canvas');
+            const resizeObserver = new ResizeObserver(entries => {
+                for (const entry of entries) {
+                    const { width, height } = entry.contentRect;
+                    if (playgroundRenderer && width > 0 && height > 0) {
+                        playgroundRenderer.resize(Math.floor(width), Math.floor(height));
+                    }
+                }
+            });
+            resizeObserver.observe(canvas);
+
+            canvas.addEventListener('mousemove', (e) => {
+                if (playgroundRenderer) {
+                    const rect = canvas.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    const result = playgroundRenderer.on_mouse_move(x, y);
+                    const data = JSON.parse(result);
+                    if (data.cursor) canvas.style.cursor = data.cursor;
+                }
+            });
+
+            canvas.addEventListener('click', (e) => {
+                if (playgroundRenderer) {
+                    const rect = canvas.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    playgroundRenderer.on_click(x, y);
+                }
+            });
+        }
+
+        function setupTabs() {
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const viewId = tab.dataset.view;
+
+                    // Update tabs
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+
+                    // Update views
+                    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+                    document.getElementById(viewId).classList.add('active');
+
+                    // Initialize showroom renderer on first view
+                    if (viewId === 'showroom' && !showroomRenderer) {
+                        showroomRenderer = new HokutoRenderer('showroom-canvas');
+                        setupShowroomCanvas();
+                        // Don't auto-select - let user pick an example
+                    }
+                });
+            });
+        }
+
+        let isRendering = false;
+
+        function setupShowroomCanvas() {
+            const canvas = document.getElementById('showroom-canvas');
+            const resizeObserver = new ResizeObserver(entries => {
+                for (const entry of entries) {
+                    const { width, height } = entry.contentRect;
+                    if (showroomRenderer && width > 0 && height > 0 && !isRendering) {
+                        showroomRenderer.resize(Math.floor(width), Math.floor(height));
+                        if (currentExample) {
+                            doShowroomRender();
+                        }
+                    }
+                }
+            });
+            resizeObserver.observe(canvas);
+        }
+
+        function doShowroomRender() {
+            if (!showroomRenderer || !currentExample || isRendering) return;
+            isRendering = true;
+            setTimeout(() => {
+                try {
+                    showroomRenderer.render(currentExample.content, null);
+                    document.getElementById('showroom-info').textContent = `${currentExample.id} - ${currentExample.title}`;
+                } catch (err) {
+                    console.error('Render error for', currentExample.id, ':', err);
+                    document.getElementById('showroom-info').textContent = `Error rendering ${currentExample.id}: ${err.message || err}`;
+                    document.getElementById('showroom-info').style.color = '#ff6b6b';
+                    setTimeout(() => {
+                        document.getElementById('showroom-info').style.color = '';
+                    }, 3000);
+                } finally {
+                    isRendering = false;
+                }
+            }, 0);
+        }
+
+        async function loadShowroom() {
+            try {
+                const response = await fetch('./showroom.json');
+                const data = await response.json();
+                examples = data.examples;
+
+                document.getElementById('example-count').textContent = `${examples.length} examples`;
+
+                renderExampleList(examples);
+
+                // Set up search
+                document.getElementById('search-input').addEventListener('input', (e) => {
+                    const query = e.target.value.toLowerCase();
+                    const filtered = examples.filter(ex =>
+                        ex.title.toLowerCase().includes(query) ||
+                        ex.id.toLowerCase().includes(query)
+                    );
+                    renderExampleList(filtered);
+                });
+
+            } catch (err) {
+                console.error('Failed to load showroom:', err);
+                document.getElementById('example-count').textContent = 'Failed to load';
+            }
+        }
+
+        function renderExampleList(exampleList) {
+            const container = document.getElementById('example-list');
+            container.innerHTML = '';
+
+            exampleList.forEach(example => {
+                const item = document.createElement('div');
+                item.className = 'example-item' + (currentExample?.id === example.id ? ' active' : '');
+                item.innerHTML = `
+                    <div class="category">${example.category}</div>
+                    <div>${example.title}</div>
+                `;
+                item.addEventListener('click', () => selectExample(example));
+                container.appendChild(item);
+            });
+        }
+
+        function selectExample(example) {
+            currentExample = example;
+
+            // Update info
+            document.getElementById('showroom-info').textContent = `${example.id} - ${example.title}`;
+
+            // Update list highlighting (without re-rendering the whole list)
+            document.querySelectorAll('.example-item').forEach((item, index) => {
+                const isActive = item.querySelector('div:last-child')?.textContent === example.title;
+                item.classList.toggle('active', isActive);
+            });
+
+            // Render after UI updates
+            doShowroomRender();
+        }
+
+        function doPlaygroundRender() {
+            if (!playgroundRenderer) return;
+
+            const html = document.getElementById('html-editor').value;
+
+            try {
+                playgroundRenderer.render(html, null);
+            } catch (err) {
+                console.error('Render error:', err);
+            }
+        }
+
+        main();
+    </script>
+</body>
+</html>
