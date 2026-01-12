@@ -2,7 +2,10 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=1200, initial-scale=0.5, minimum-scale=0.25, maximum-scale=2, user-scalable=yes">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>Hokuto WebAssembly Demo</title>
     <style>
         * {
@@ -113,6 +116,9 @@
             border-radius: 4px;
             width: 100%;
         }
+        #canvas:focus, #showroom-canvas:focus {
+            outline: 2px solid #4fc3f7;
+        }
         .toolbar {
             display: flex;
             gap: 0.5rem;
@@ -143,9 +149,12 @@
         #showroom {
             flex-direction: row;
             height: calc(100vh - 60px);
+            max-height: calc(100vh - 60px);
+            overflow: hidden;
         }
         .sidebar {
             width: 300px;
+            min-width: 300px;
             background: #16213e;
             border-right: 1px solid #0f3460;
             display: flex;
@@ -202,6 +211,7 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            min-width: 0;
         }
         .showroom-preview {
             flex: 1;
@@ -209,12 +219,16 @@
             display: flex;
             flex-direction: column;
             min-height: 0;
+            overflow: hidden;
         }
         #showroom-canvas {
             flex: 1;
             background: white;
             border-radius: 4px;
             width: 100%;
+            height: 100%;
+            max-height: 100%;
+            min-height: 0;
         }
         .showroom-info {
             padding: 0.5rem 1rem;
@@ -222,12 +236,14 @@
             border-top: 1px solid #0f3460;
             font-size: 13px;
             color: #888;
+            flex-shrink: 0;
         }
         .example-count {
             color: #4fc3f7;
             font-size: 12px;
             padding: 0.5rem 1rem;
             border-bottom: 1px solid #0f3460;
+            flex-shrink: 0;
         }
     </style>
 </head>
@@ -290,7 +306,7 @@
             </div>
             <div class="panel preview-panel">
                 <h2>Preview (WebGL)</h2>
-                <canvas id="canvas"></canvas>
+                <canvas id="canvas" tabindex="0"></canvas>
             </div>
         </div>
 
@@ -305,7 +321,7 @@
             </div>
             <div class="showroom-content">
                 <div class="showroom-preview">
-                    <canvas id="showroom-canvas"></canvas>
+                    <canvas id="showroom-canvas" tabindex="0"></canvas>
                 </div>
                 <div class="showroom-info" id="showroom-info">Select an example from the list</div>
             </div>
@@ -315,10 +331,12 @@
     <script type="module">
         import init, { HokutoRenderer, version } from './pkg/hokuto_wasm.js';
 
-        let playgroundRenderer = null;
-        let showroomRenderer = null;
+        // Single renderer approach - only one active at a time for mobile compatibility
+        let renderer = null;
+        let currentCanvas = null;
         let examples = [];
         let currentExample = null;
+        let activeView = 'playground';
 
         async function main() {
             try {
@@ -329,9 +347,10 @@
                 const ver = version();
                 console.log(`Hokuto WASM v${ver}`);
 
-                // Create playground renderer
+                // Create initial renderer for playground
                 document.getElementById('status').textContent = 'Creating renderer...';
-                playgroundRenderer = new HokutoRenderer('canvas');
+                renderer = new HokutoRenderer('canvas');
+                currentCanvas = 'canvas';
 
                 document.getElementById('status').textContent = `Ready (v${ver})`;
 
@@ -367,30 +386,145 @@
             const resizeObserver = new ResizeObserver(entries => {
                 for (const entry of entries) {
                     const { width, height } = entry.contentRect;
-                    if (playgroundRenderer && width > 0 && height > 0) {
-                        playgroundRenderer.resize(Math.floor(width), Math.floor(height));
+                    if (renderer && currentCanvas === 'canvas' && width > 0 && height > 0) {
+                        renderer.resize(Math.floor(width), Math.floor(height));
                     }
                 }
             });
             resizeObserver.observe(canvas);
 
             canvas.addEventListener('mousemove', (e) => {
-                if (playgroundRenderer) {
+                if (renderer && currentCanvas === 'canvas') {
                     const rect = canvas.getBoundingClientRect();
                     const x = e.clientX - rect.left;
                     const y = e.clientY - rect.top;
-                    const result = playgroundRenderer.on_mouse_move(x, y);
+                    const result = renderer.on_mouse_move(x, y);
                     const data = JSON.parse(result);
                     if (data.cursor) canvas.style.cursor = data.cursor;
                 }
             });
 
-            canvas.addEventListener('click', (e) => {
-                if (playgroundRenderer) {
+            // Mouse down for drag selection start
+            canvas.addEventListener('mousedown', (e) => {
+                if (renderer && currentCanvas === 'canvas') {
                     const rect = canvas.getBoundingClientRect();
                     const x = e.clientX - rect.left;
                     const y = e.clientY - rect.top;
-                    playgroundRenderer.on_click(x, y);
+                    const result = JSON.parse(renderer.on_mouse_down(x, y, e.timeStamp));
+                    // Focus canvas when clicking on an input element
+                    if (result.focused) {
+                        canvas.focus();
+                    }
+                }
+            });
+
+            // Mouse up for drag selection end
+            canvas.addEventListener('mouseup', () => {
+                if (renderer && currentCanvas === 'canvas') {
+                    renderer.on_mouse_up();
+                }
+            });
+
+            // Also handle mouseup outside the canvas
+            document.addEventListener('mouseup', () => {
+                if (renderer && currentCanvas === 'canvas') {
+                    renderer.on_mouse_up();
+                }
+            });
+
+            // Keyboard event handlers for form input
+            canvas.addEventListener('keydown', async (e) => {
+                if (renderer && currentCanvas === 'canvas' && renderer.has_focus()) {
+                    // Handle clipboard operations
+                    if ((e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey) {
+                        if (e.key === 'c' || e.key === 'C') {
+                            // Copy
+                            const text = renderer.get_selected_text();
+                            if (text) {
+                                try {
+                                    await navigator.clipboard.writeText(text);
+                                } catch (err) {
+                                    console.error('Copy failed:', err);
+                                }
+                            }
+                            e.preventDefault();
+                            return;
+                        }
+                        if (e.key === 'x' || e.key === 'X') {
+                            // Cut
+                            const text = renderer.cut();
+                            if (text) {
+                                try {
+                                    await navigator.clipboard.writeText(text);
+                                } catch (err) {
+                                    console.error('Cut copy failed:', err);
+                                }
+                            }
+                            e.preventDefault();
+                            return;
+                        }
+                        if (e.key === 'v' || e.key === 'V') {
+                            // Paste
+                            try {
+                                const text = await navigator.clipboard.readText();
+                                if (text) {
+                                    renderer.paste(text);
+                                }
+                            } catch (err) {
+                                console.error('Paste failed:', err);
+                            }
+                            e.preventDefault();
+                            return;
+                        }
+                    }
+
+                    const handled = renderer.on_key_down(
+                        e.key,
+                        e.ctrlKey || e.metaKey,
+                        e.shiftKey,
+                        e.altKey
+                    );
+                    if (handled) {
+                        e.preventDefault();
+                    }
+                }
+            });
+
+            // Text input via beforeinput event (works better for international text)
+            canvas.addEventListener('beforeinput', (e) => {
+                if (renderer && currentCanvas === 'canvas' && renderer.has_focus()) {
+                    // Handle line break insertion (Enter key in some browsers)
+                    if (e.inputType === 'insertLineBreak' || e.inputType === 'insertParagraph') {
+                        // Let keydown handle this
+                        return;
+                    }
+                    if (e.data) {
+                        const handled = renderer.on_text_input(e.data);
+                        if (handled) {
+                            e.preventDefault();
+                        }
+                    }
+                }
+            });
+
+            // Fallback: keypress for text input (for browsers that don't support beforeinput well)
+            canvas.addEventListener('keypress', (e) => {
+                if (renderer && currentCanvas === 'canvas' && renderer.has_focus()) {
+                    // Skip control characters and keys with modifiers (except shift)
+                    if (e.ctrlKey || e.metaKey || e.altKey) return;
+                    if (e.key.length === 1) {
+                        const handled = renderer.on_text_input(e.key);
+                        if (handled) {
+                            e.preventDefault();
+                        }
+                    }
+                }
+            });
+
+            // Handle canvas blur
+            canvas.addEventListener('blur', () => {
+                if (renderer && currentCanvas === 'canvas') {
+                    renderer.on_blur();
                 }
             });
         }
@@ -408,41 +542,215 @@
                     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
                     document.getElementById(viewId).classList.add('active');
 
-                    // Initialize showroom renderer on first view
-                    if (viewId === 'showroom' && !showroomRenderer) {
-                        showroomRenderer = new HokutoRenderer('showroom-canvas');
-                        setupShowroomCanvas();
-                        // Don't auto-select - let user pick an example
+                    activeView = viewId;
+
+                    // Switch renderer to the appropriate canvas
+                    if (viewId === 'showroom') {
+                        switchToCanvas('showroom-canvas');
+                    } else {
+                        switchToCanvas('canvas');
                     }
                 });
             });
         }
 
+        function switchToCanvas(canvasId) {
+            if (currentCanvas === canvasId && renderer) {
+                // Already on this canvas, just re-render
+                requestAnimationFrame(() => {
+                    if (canvasId === 'showroom-canvas' && currentExample) {
+                        doShowroomRender();
+                    } else if (canvasId === 'canvas') {
+                        doPlaygroundRender();
+                    }
+                });
+                return;
+            }
+
+            // Wait for canvas to be visible
+            requestAnimationFrame(() => {
+                const canvas = document.getElementById(canvasId);
+                const rect = canvas.getBoundingClientRect();
+                console.log(`Switching to ${canvasId}, size: ${rect.width}x${rect.height}`);
+
+                // Create new renderer for this canvas
+                // The old renderer will be garbage collected
+                renderer = new HokutoRenderer(canvasId);
+                currentCanvas = canvasId;
+
+                // Set initial size
+                if (rect.width > 0 && rect.height > 0) {
+                    renderer.resize(Math.floor(rect.width), Math.floor(rect.height));
+                }
+
+                // Setup resize observer for showroom
+                if (canvasId === 'showroom-canvas') {
+                    setupShowroomCanvas();
+                }
+
+                // Render content
+                if (canvasId === 'showroom-canvas' && currentExample) {
+                    doShowroomRender();
+                } else if (canvasId === 'canvas') {
+                    doPlaygroundRender();
+                }
+            });
+        }
+
         let isRendering = false;
+        let showroomResizeObserver = null;
 
         function setupShowroomCanvas() {
+            // Only set up once
+            if (showroomResizeObserver) return;
+
             const canvas = document.getElementById('showroom-canvas');
-            const resizeObserver = new ResizeObserver(entries => {
+            showroomResizeObserver = new ResizeObserver(entries => {
                 for (const entry of entries) {
                     const { width, height } = entry.contentRect;
-                    if (showroomRenderer && width > 0 && height > 0 && !isRendering) {
-                        showroomRenderer.resize(Math.floor(width), Math.floor(height));
+                    if (renderer && currentCanvas === 'showroom-canvas' && width > 0 && height > 0 && !isRendering) {
+                        renderer.resize(Math.floor(width), Math.floor(height));
                         if (currentExample) {
                             doShowroomRender();
                         }
                     }
                 }
             });
-            resizeObserver.observe(canvas);
+            showroomResizeObserver.observe(canvas);
+
+            // Mouse events for showroom
+            canvas.addEventListener('mousemove', (e) => {
+                if (renderer && currentCanvas === 'showroom-canvas') {
+                    const rect = canvas.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    const result = renderer.on_mouse_move(x, y);
+                    const data = JSON.parse(result);
+                    if (data.cursor) canvas.style.cursor = data.cursor;
+                }
+            });
+
+            // Mouse down for drag selection start
+            canvas.addEventListener('mousedown', (e) => {
+                if (renderer && currentCanvas === 'showroom-canvas') {
+                    const rect = canvas.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    const result = JSON.parse(renderer.on_mouse_down(x, y, e.timeStamp));
+                    if (result.focused) {
+                        canvas.focus();
+                    }
+                }
+            });
+
+            // Mouse up for drag selection end
+            canvas.addEventListener('mouseup', () => {
+                if (renderer && currentCanvas === 'showroom-canvas') {
+                    renderer.on_mouse_up();
+                }
+            });
+
+            // Keyboard event handlers for form input
+            canvas.addEventListener('keydown', async (e) => {
+                if (renderer && currentCanvas === 'showroom-canvas' && renderer.has_focus()) {
+                    // Handle clipboard operations
+                    if ((e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey) {
+                        if (e.key === 'c' || e.key === 'C') {
+                            const text = renderer.get_selected_text();
+                            if (text) {
+                                try {
+                                    await navigator.clipboard.writeText(text);
+                                } catch (err) {
+                                    console.error('Copy failed:', err);
+                                }
+                            }
+                            e.preventDefault();
+                            return;
+                        }
+                        if (e.key === 'x' || e.key === 'X') {
+                            const text = renderer.cut();
+                            if (text) {
+                                try {
+                                    await navigator.clipboard.writeText(text);
+                                } catch (err) {
+                                    console.error('Cut copy failed:', err);
+                                }
+                            }
+                            e.preventDefault();
+                            return;
+                        }
+                        if (e.key === 'v' || e.key === 'V') {
+                            try {
+                                const text = await navigator.clipboard.readText();
+                                if (text) {
+                                    renderer.paste(text);
+                                }
+                            } catch (err) {
+                                console.error('Paste failed:', err);
+                            }
+                            e.preventDefault();
+                            return;
+                        }
+                    }
+
+                    const handled = renderer.on_key_down(
+                        e.key,
+                        e.ctrlKey || e.metaKey,
+                        e.shiftKey,
+                        e.altKey
+                    );
+                    if (handled) {
+                        e.preventDefault();
+                    }
+                }
+            });
+
+            canvas.addEventListener('beforeinput', (e) => {
+                if (renderer && currentCanvas === 'showroom-canvas' && renderer.has_focus()) {
+                    // Handle line break insertion (Enter key in some browsers)
+                    if (e.inputType === 'insertLineBreak' || e.inputType === 'insertParagraph') {
+                        // Let keydown handle this
+                        return;
+                    }
+                    if (e.data) {
+                        const handled = renderer.on_text_input(e.data);
+                        if (handled) {
+                            e.preventDefault();
+                        }
+                    }
+                }
+            });
+
+            canvas.addEventListener('keypress', (e) => {
+                if (renderer && currentCanvas === 'showroom-canvas' && renderer.has_focus()) {
+                    if (e.ctrlKey || e.metaKey || e.altKey) return;
+                    if (e.key.length === 1) {
+                        const handled = renderer.on_text_input(e.key);
+                        if (handled) {
+                            e.preventDefault();
+                        }
+                    }
+                }
+            });
+
+            canvas.addEventListener('blur', () => {
+                if (renderer && currentCanvas === 'showroom-canvas') {
+                    renderer.on_blur();
+                }
+            });
         }
 
         function doShowroomRender() {
-            if (!showroomRenderer || !currentExample || isRendering) return;
+            console.log('doShowroomRender called, renderer:', !!renderer, 'canvas:', currentCanvas, 'example:', currentExample?.id);
+            if (!renderer || currentCanvas !== 'showroom-canvas' || !currentExample || isRendering) return;
+
             isRendering = true;
             setTimeout(() => {
                 try {
-                    showroomRenderer.render(currentExample.content, null);
+                    console.log('Rendering example:', currentExample.id);
+                    renderer.render(currentExample.content, null);
                     document.getElementById('showroom-info').textContent = `${currentExample.id} - ${currentExample.title}`;
+                    console.log('Render complete');
                 } catch (err) {
                     console.error('Render error for', currentExample.id, ':', err);
                     document.getElementById('showroom-info').textContent = `Error rendering ${currentExample.id}: ${err.message || err}`;
@@ -515,12 +823,12 @@
         }
 
         function doPlaygroundRender() {
-            if (!playgroundRenderer) return;
+            if (!renderer || currentCanvas !== 'canvas') return;
 
             const html = document.getElementById('html-editor').value;
 
             try {
-                playgroundRenderer.render(html, null);
+                renderer.render(html, null);
             } catch (err) {
                 console.error('Render error:', err);
             }
