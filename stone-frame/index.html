@@ -1,25 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stoneframe</title>
+    <title>Dungeon Master - Hall of Champions</title>
     <style>
         html, body {
             margin: 0;
             padding: 0;
             overflow: hidden;
-            background: #000;
+            background: #1a1612;
+            height: 100%;
         }
-        canvas {
+        #glcanvas {
             display: block;
             margin: 0 auto;
+            outline: none;
+            width: 1350px;
+            height: 600px;
+        }
+        #loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #d09070;
+            font-family: monospace;
+            font-size: 24px;
         }
     </style>
 </head>
 <body>
-    <canvas id="glcanvas" tabindex="1"></canvas>
-    <script src="https://nicokraft.com/nicokraft.com/macroquad/mq_js_bundle.js"></script>
-    <script>load("client.wasm");</script>
+    <div id="loading">Loading...</div>
+    <canvas id="glcanvas" tabindex="1" width="1350" height="600"></canvas>
+    <script src="https://not-fl3.github.io/miniquad-samples/mq_js_bundle.js"></script>
+    <script>
+        // Load the WASM module
+        load("client.wasm");
+
+        // Hide loading after a short delay
+        setTimeout(function() {
+            document.getElementById("loading").style.display = "none";
+            // Focus canvas for keyboard input
+            document.getElementById("glcanvas").focus();
+        }, 1000);
+    </script>
 </body>
 </html>

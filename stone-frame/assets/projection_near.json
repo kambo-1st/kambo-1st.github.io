@@ -1,0 +1,227 @@
+{
+  "near_depth": 8,
+  "viewport": {
+    "width": 320,
+    "height": 200,
+    "center_x": 160,
+    "center_y": 100
+  },
+  "depths": [
+    {
+      "d": 1,
+      "front_wall": { "x": 32, "y": 20, "w": 256, "h": 160 },
+      "left_wall": {
+        "top_left_x": 0,
+        "top_right_x": 32,
+        "top_y": 0,
+        "bottom_left_x": 0,
+        "bottom_right_x": 32,
+        "bottom_y": 200
+      },
+      "right_wall": {
+        "top_left_x": 288,
+        "top_right_x": 320,
+        "top_y": 0,
+        "bottom_left_x": 288,
+        "bottom_right_x": 320,
+        "bottom_y": 200
+      },
+      "ceiling": { "x": 32, "y": 0, "w": 256, "h": 20 },
+      "floor": { "x": 32, "y": 180, "w": 256, "h": 20 },
+      "slots": {
+        "left": { "x": 48, "y": 60, "w": 64, "h": 100 },
+        "center": { "x": 128, "y": 60, "w": 64, "h": 100 },
+        "right": { "x": 208, "y": 60, "w": 64, "h": 100 }
+      }
+    },
+    {
+      "d": 2,
+      "front_wall": { "x": 56, "y": 30, "w": 208, "h": 140 },
+      "left_wall": {
+        "top_left_x": 32,
+        "top_right_x": 56,
+        "top_y": 20,
+        "bottom_left_x": 32,
+        "bottom_right_x": 56,
+        "bottom_y": 180
+      },
+      "right_wall": {
+        "top_left_x": 264,
+        "top_right_x": 288,
+        "top_y": 20,
+        "bottom_left_x": 264,
+        "bottom_right_x": 288,
+        "bottom_y": 180
+      },
+      "ceiling": { "x": 56, "y": 20, "w": 208, "h": 10 },
+      "floor": { "x": 56, "y": 170, "w": 208, "h": 10 },
+      "slots": {
+        "left": { "x": 68, "y": 60, "w": 52, "h": 80 },
+        "center": { "x": 134, "y": 60, "w": 52, "h": 80 },
+        "right": { "x": 200, "y": 60, "w": 52, "h": 80 }
+      }
+    },
+    {
+      "d": 3,
+      "front_wall": { "x": 76, "y": 40, "w": 168, "h": 120 },
+      "left_wall": {
+        "top_left_x": 56,
+        "top_right_x": 76,
+        "top_y": 30,
+        "bottom_left_x": 56,
+        "bottom_right_x": 76,
+        "bottom_y": 170
+      },
+      "right_wall": {
+        "top_left_x": 244,
+        "top_right_x": 264,
+        "top_y": 30,
+        "bottom_left_x": 244,
+        "bottom_right_x": 264,
+        "bottom_y": 170
+      },
+      "ceiling": { "x": 76, "y": 30, "w": 168, "h": 10 },
+      "floor": { "x": 76, "y": 160, "w": 168, "h": 10 },
+      "slots": {
+        "left": { "x": 86, "y": 60, "w": 44, "h": 64 },
+        "center": { "x": 138, "y": 60, "w": 44, "h": 64 },
+        "right": { "x": 190, "y": 60, "w": 44, "h": 64 }
+      }
+    },
+    {
+      "d": 4,
+      "front_wall": { "x": 92, "y": 48, "w": 136, "h": 104 },
+      "left_wall": {
+        "top_left_x": 76,
+        "top_right_x": 92,
+        "top_y": 40,
+        "bottom_left_x": 76,
+        "bottom_right_x": 92,
+        "bottom_y": 160
+      },
+      "right_wall": {
+        "top_left_x": 228,
+        "top_right_x": 244,
+        "top_y": 40,
+        "bottom_left_x": 228,
+        "bottom_right_x": 244,
+        "bottom_y": 160
+      },
+      "ceiling": { "x": 92, "y": 40, "w": 136, "h": 8 },
+      "floor": { "x": 92, "y": 152, "w": 136, "h": 8 },
+      "slots": {
+        "left": { "x": 100, "y": 64, "w": 36, "h": 52 },
+        "center": { "x": 142, "y": 64, "w": 36, "h": 52 },
+        "right": { "x": 184, "y": 64, "w": 36, "h": 52 }
+      }
+    },
+    {
+      "d": 5,
+      "front_wall": { "x": 104, "y": 54, "w": 112, "h": 92 },
+      "left_wall": {
+        "top_left_x": 92,
+        "top_right_x": 104,
+        "top_y": 48,
+        "bottom_left_x": 92,
+        "bottom_right_x": 104,
+        "bottom_y": 152
+      },
+      "right_wall": {
+        "top_left_x": 216,
+        "top_right_x": 228,
+        "top_y": 48,
+        "bottom_left_x": 216,
+        "bottom_right_x": 228,
+        "bottom_y": 152
+      },
+      "ceiling": { "x": 104, "y": 48, "w": 112, "h": 6 },
+      "floor": { "x": 104, "y": 146, "w": 112, "h": 6 },
+      "slots": {
+        "left": { "x": 110, "y": 68, "w": 30, "h": 44 },
+        "center": { "x": 145, "y": 68, "w": 30, "h": 44 },
+        "right": { "x": 180, "y": 68, "w": 30, "h": 44 }
+      }
+    },
+    {
+      "d": 6,
+      "front_wall": { "x": 114, "y": 60, "w": 92, "h": 80 },
+      "left_wall": {
+        "top_left_x": 104,
+        "top_right_x": 114,
+        "top_y": 54,
+        "bottom_left_x": 104,
+        "bottom_right_x": 114,
+        "bottom_y": 146
+      },
+      "right_wall": {
+        "top_left_x": 206,
+        "top_right_x": 216,
+        "top_y": 54,
+        "bottom_left_x": 206,
+        "bottom_right_x": 216,
+        "bottom_y": 146
+      },
+      "ceiling": { "x": 114, "y": 54, "w": 92, "h": 6 },
+      "floor": { "x": 114, "y": 140, "w": 92, "h": 6 },
+      "slots": {
+        "left": { "x": 118, "y": 72, "w": 26, "h": 36 },
+        "center": { "x": 147, "y": 72, "w": 26, "h": 36 },
+        "right": { "x": 176, "y": 72, "w": 26, "h": 36 }
+      }
+    },
+    {
+      "d": 7,
+      "front_wall": { "x": 122, "y": 64, "w": 76, "h": 72 },
+      "left_wall": {
+        "top_left_x": 114,
+        "top_right_x": 122,
+        "top_y": 60,
+        "bottom_left_x": 114,
+        "bottom_right_x": 122,
+        "bottom_y": 140
+      },
+      "right_wall": {
+        "top_left_x": 198,
+        "top_right_x": 206,
+        "top_y": 60,
+        "bottom_left_x": 198,
+        "bottom_right_x": 206,
+        "bottom_y": 140
+      },
+      "ceiling": { "x": 122, "y": 60, "w": 76, "h": 4 },
+      "floor": { "x": 122, "y": 136, "w": 76, "h": 4 },
+      "slots": {
+        "left": { "x": 126, "y": 76, "w": 22, "h": 30 },
+        "center": { "x": 149, "y": 76, "w": 22, "h": 30 },
+        "right": { "x": 172, "y": 76, "w": 22, "h": 30 }
+      }
+    },
+    {
+      "d": 8,
+      "front_wall": { "x": 128, "y": 68, "w": 64, "h": 64 },
+      "left_wall": {
+        "top_left_x": 122,
+        "top_right_x": 128,
+        "top_y": 64,
+        "bottom_left_x": 122,
+        "bottom_right_x": 128,
+        "bottom_y": 136
+      },
+      "right_wall": {
+        "top_left_x": 192,
+        "top_right_x": 198,
+        "top_y": 64,
+        "bottom_left_x": 192,
+        "bottom_right_x": 198,
+        "bottom_y": 136
+      },
+      "ceiling": { "x": 128, "y": 64, "w": 64, "h": 4 },
+      "floor": { "x": 128, "y": 132, "w": 64, "h": 4 },
+      "slots": {
+        "left": { "x": 130, "y": 78, "w": 18, "h": 26 },
+        "center": { "x": 151, "y": 78, "w": 18, "h": 26 },
+        "right": { "x": 172, "y": 78, "w": 18, "h": 26 }
+      }
+    }
+  ]
+}

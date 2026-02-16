@@ -1,0 +1,60 @@
+{
+  "far_depth_start": 9,
+  "far_depth_end": 20,
+  "viewport": {
+    "width": 320,
+    "height": 200,
+    "center_x": 160,
+    "center_y": 100
+  },
+  "sky_band": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 68
+  },
+  "horizon_band": {
+    "x": 128,
+    "y": 68,
+    "w": 64,
+    "h": 16
+  },
+  "far_ground_band": {
+    "x": 128,
+    "y": 84,
+    "w": 64,
+    "h": 48
+  },
+  "inner_window": {
+    "x": 128,
+    "y": 68,
+    "w": 64,
+    "h": 64,
+    "description": "The area where near-field depth 8 ends and far-field begins"
+  },
+  "silhouette_slots": [
+    {
+      "anchor_x": 139,
+      "anchor_y": 84,
+      "max_w": 21,
+      "max_h": 16
+    },
+    {
+      "anchor_x": 160,
+      "anchor_y": 84,
+      "max_w": 21,
+      "max_h": 16
+    },
+    {
+      "anchor_x": 181,
+      "anchor_y": 84,
+      "max_w": 21,
+      "max_h": 16
+    }
+  ],
+  "fog_depths": {
+    "horizon_fog_depth": 15,
+    "ground_fog_depth": 18,
+    "description": "Approximate depth values used for fog table lookups"
+  }
+}
